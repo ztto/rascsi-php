@@ -1,0 +1,53 @@
+■RaSCSI-phpの設定
+
+■フォルダ作成
+$ mkdir /home/samba/HDD
+$ chmod 777 /home/samba/HDD
+
+■web関連
+NGINXのインストール
+$ sudo apt -y install nginx
+PHPのインストール
+$ sudo apt -y install php7.0-fpm
+
+NGINXでPHPを有効にする
+$ cd /etc/nginx/sites-enabled
+$ sudo vi default 
+
+----------部分のファイルを修正----------
+ 44 index index.php index.html index.htm index.nginx-debian.html ;
+
+ 56         location ~ \.php$ {
+ 57                 include snippets/fastcgi-php.conf;
+ 58         #
+ 59         #       # With php-fpm (or other unix sockets):
+ 60                 fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 61         #       # With php-cgi (or other tcp sockets):
+ 62         #       fastcgi_pass 127.0.0.1:9000;
+ 63         }
+----------部分のファイルを修正----------
+
+phpで再起動＆電源断を行う
+sudoの権限でシャットダウンを実行する権限をユーザに与えます
+sudoersファイルを開く
+$ sudo visudo
+行を追加する
+www-data ALL=NOPASSWD:/sbin/shutdown
+ファイルの保存はctrl+O
+
+起動方法
+$ sudo service php7.0-fpm restart
+$ sudo service nginx restart
+
+■RaSCSI-phpのコピー
+index.phpを /var/www/html/ にコピー
+
+RaSCSI-phpの編集
+$ cd /var/www/html
+$ vi index.php
+※index.phpの以下の場所を環境に合わせて書き換えます
+    define("IMAGE_PATH", "/home/samba/HDD/");
+    define("PROCESS_PATH", "/usr/local/bin/");
+    define("PROCESS_NAME1", "rasctl");
+    define("PROCESS_NAME2", "rascsi");
+

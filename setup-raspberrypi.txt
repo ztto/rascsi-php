@@ -1,0 +1,77 @@
+■Raspberry piのインストール
+SDFormatter でsdcardの初期化
+Win32DiskImager でイメージの書き込み
+
+SSHを有効にする
+bootパーティションに[ssh]という名前のファイルを作成
+※拡張子なし
+
+Wi-Fiの設定をする
+bootパーティションに「wpa_supplicant.conf」を作成
+
+----------ファイルに記述----------
+country=JP
+ctrl_interface=/var/run/wpa_supplicant
+network={
+    ssid="SSID"
+    psk="パスワード"
+    key_mgmt=WPA-PSK
+    proto=WPA WPA2
+    pairwise=CCMP TKIP
+    group=CCMP TKIP WEP104 WEP40
+}
+----------ファイルに記述----------
+
+起動
+id:pi
+password:raspberry
+
+最新環境アップデート
+$ sudo apt update
+$ sudo apt upgrade
+
+初期設定
+$ sudo raspi-config
+
+"4 Localisation Options"から "I1 Change Locale"を選択
+
+変更
+ en_US.UTF-8 UTF-8
+ ja_JP.EUC-JP EUC-JP
+ ja_JP.UTF-8 UTF-8
+ 
+デフォルトのロケール
+ en_US.UTF-8 UTF-8
+
+"4 Localisation Options"から"I2 Change Timezone"を選択
+
+変更
+ Asia -> Tokyo
+
+"7 Advanced Options"から "A1 Expand Filesystem"を選択
+
+上記作業が終わったら再起動
+$ sudo reboot
+
+■sambaのインストール
+$ sudo apt install samba
+
+$ sudo mkdir /home/samba
+$ sudo chmod 777 /home/samba
+
+$ sudo cp -p /etc/samba/smb.conf /etc/samba/smb.conf.org
+$ sudo vi /etc/samba/smb.conf 
+
+----------ファイルの下に追加----------
+[public]
+   comment = Raspberry Pi
+   path = /home/samba
+   guest ok = yes
+   read only = no
+   public = yes
+   browsable = yes
+   force user = pi
+----------ファイルの下に追加----------
+
+sambaの起動
+$ sudo /etc/init.d/samba restart
