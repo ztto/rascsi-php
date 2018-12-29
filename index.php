@@ -185,7 +185,7 @@ function infoOut() {
         echo '停止中</div>';
     } else {
         echo '起動中</div>';
-        $command = PROCESS_NAME1.' -l';
+        $command = PROCESS_PATH.PROCESS_NAME1.' -l';
         $output = array();
         $ret = null;
         exec($command, $output, $ret);
