@@ -1,5 +1,35 @@
 ■RaSCSI-phpの設定
 
+■自動起動の設定
+$ sudo vi /etc/systemd/system/rascsi.service
+
+----------部分でファイルを作成----------
+[Unit]
+Description=RaSCSI_Service
+After=syslog.target
+[Service]
+Type=simple
+ExecStart=/usr/bin/sudo /usr/local/bin/rasmount.sh
+TimeoutStopSec=5
+StandardOutput=null
+Restart=no
+[Install]
+WantedBy = multi-user.target
+----------部分でファイルを作成----------
+
+$ sudo vi /usr/local/bin/rasmount.sh
+
+----------部分でファイルを作成----------
+!/bin/sh
+rascsi -ID6 bridge
+----------部分でファイルを作成----------
+
+実行権限付与
+$ sudo chmod 755 rasmount.sh
+
+サービス自動起動
+$ sudo systemctl enable rascsi
+
 ■フォルダ作成
 $ mkdir /home/samba/HDD
 $ chmod 777 /home/samba/HDD
