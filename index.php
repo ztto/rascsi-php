@@ -180,7 +180,7 @@ function infoOut() {
     echo '<div id="info">';
     // プロセス確認
     echo '<p><div>プロセス状況:';
-    $result = exec("ps -aef | grep ".PROCESS_PATH.PROCESS_NAME2." | grep -v grep", $output);
+    $result = exec("ps -aef | grep ".PROCESS_NAME2." | grep -v grep", $output);
     if(empty($output)) {
         echo '停止中</div>';
     } else {
