@@ -1,0 +1,32 @@
+■Raspberry piのインストール
+SDFormatter でsdcardの初期化
+Win32DiskImager でイメージの書き込み
+
+SSHを有効にする
+bootパーティションに[ssh]という名前のファイルを作成
+※拡張子なし
+
+Wi-Fiの設定をする
+bootパーティションに「wpa_supplicant.conf」を作成
+
+----------ファイルに記述----------
+country=JP
+ctrl_interface=/var/run/wpa_supplicant
+network={
+    ssid="SSID"
+    psk="パスワード"
+    key_mgmt=WPA-PSK
+    proto=WPA WPA2
+    pairwise=CCMP TKIP
+    group=CCMP TKIP WEP104 WEP40
+}
+----------ファイルに記述----------
+
+起動
+id:pi
+password:raspberry
+
+gitからセットアップファイルを落とす
+wget https://raw.githubusercontent.com/ztto/rascsi-php/master/raspberrypi_setup.sh
+chmod 755 raspberrypi_setup.sh
+sudo ./raspberrypi_setup.sh
