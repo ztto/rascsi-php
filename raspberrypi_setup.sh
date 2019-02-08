@@ -2,6 +2,80 @@
 
 #
 #
+function conform_check() {
+
+	# sudo 
+	if [[ "$(id -u)" -ne 0 ]]; then
+	 	echo "Try 'sudo $0'"
+	        echo "  実行する場合は 'sudo $0' と入力して下さい."
+		exit 1
+	fi
+}
+
+function board_check() {
+
+	echo "----------------------------"
+	echo "  対象となるボードを選んでください."
+	echo "  1:RaSCSI"
+	echo "  2:FDX68"
+	echo "  q:終了"
+	read input
+
+	if [ -z $input ] ; then
+		board_check
+
+	elif [ $input = '1' ] ; then
+		board='RaSCSI'
+
+	elif [ $input = '2' ] ; then
+		board='FDX68'
+
+	elif [ $input = 'q' ] || [ $input = 'Q' ] ; then
+		echo "  スクリプトを終了します."
+		exit 1
+
+	else
+		board_check
+
+	fi
+}
+
+function rascsi_check() {
+
+	echo "----------------------------"
+	echo "  対象となるボードを選んでください."
+	echo "  1:standard版"
+	echo "  2:fullspec版"
+	echo "  3:aibom版"
+	echo "  4:gamernium版"
+	echo "  q:終了"
+	read input
+
+	if [ -z $input ] ; then
+		rascsi_check
+
+	elif [ $input = '1' ] ; then
+		bpath='standard'
+
+	elif [ $input = '2' ] ; then
+		bpath='fullspec'
+
+	elif [ $input = '3' ] ; then
+		bpath='aibom'
+
+	elif [ $input = '4' ] ; then
+		bpath='gamernium'
+
+	elif [ $input = 'q' ] || [ $input = 'Q' ] ; then
+		echo "  スクリプトを終了します."
+		exit 1
+
+	else
+		rascsi_check
+
+	fi
+}
+
 # update package and firmware
 function update_package(){
 
@@ -33,18 +107,18 @@ function update_raspiconf(){
 function apt_get_install(){
 
 	# Install Samba
-	if ! grep "RaSCSI" "/etc/samba/smb.conf" >/dev/null; then
+	if ! grep "raspberry pi" "/etc/samba/smb.conf" >/dev/null; then
 
 		apt-get install  -y samba
 	   	cp -p /etc/samba/smb.conf /etc/samba/smb.conf.org
-		echo "[RaSCSI]" >> /etc/samba/smb.conf
-		echo "   comment = RaSCSI" >> /etc/samba/smb.conf
-		echo "   path = /home/pi/rasimg" >> /etc/samba/smb.conf
+		echo "[public]" >> /etc/samba/smb.conf
+		echo "   comment = raspberry pi" >> /etc/samba/smb.conf
+		echo "   path = /home/pi" >> /etc/samba/smb.conf
 		echo "   public = yes" >> /etc/samba/smb.conf
 		echo "   read only = no" >> /etc/samba/smb.conf
 		echo "   browsable = yes" >> /etc/samba/smb.conf
-		echo "   force user = pi" >> /etc/samba/smb.conf
 		echo "   guest ok = yes" >> /etc/samba/smb.conf
+		echo "   force user = pi" >> /etc/samba/smb.conf
 		echo "   force create mode = 0777" >> /etc/samba/smb.conf
 		echo "   force directory mode = 0777" >> /etc/samba/smb.conf
         fi
@@ -55,7 +129,7 @@ function rascsi_install(){
 
 	# Install Rascsi
 	cd /tmp
-	wget http://www.geocities.jp/kugimoto0715/rascsi/rascsi141.zip
+	wget http://retropc.net/gimons/rascsi/rascsi141.zip
 	unzip rascsi141.zip
 	cd rascsi141/bin/raspberrypi/
 	tar xzvf rascsi.tar.gz
@@ -64,8 +138,8 @@ function rascsi_install(){
 	cd /tmp
 	rm -r rascsi141.zip rascsi141
 
-	sudo mkdir /home/pi/rasimg
-	sudo chmod 777 /home/pi/rasimg
+	mkdir /home/pi/rasimg
+	chmod 777 /home/pi/rasimg
 
 	echo "!/bin/sh" > /home/pi/rasimg/rasmount.sh
 	echo "rascsi -ID0 /home/pi/rasimg/scsiimg0.hds -ID6 bridge" >> /home/pi/rasimg/rasmount.sh
@@ -88,54 +162,34 @@ function rascsi_install(){
 	systemctl enable rascsi
 }
 
-function conform_check() {
+# install fdx68 package
+function fdx68_install(){
 
-	# sudo 
-	if [[ "$(id -u)" -ne 0 ]]; then
-	 	echo "Try 'sudo $0'"
-	        echo "  実行する場合は 'sudo $0' と入力して下さい."
-		exit 1
-	fi
+	# Install fdx68
+	mkdir /tmp/fdx68
+	cd /tmp/fdx68
+	wget http://retropc.net/gimons/fdx68/fdx68_114.tar.gz
+	tar xzvf fdx68_114.tar.gz
+        rm -r fdx68_114.tar.gz
+        cp -p * /usr/local/bin
 
-	echo "----------------------------"
-	echo "  対象となるボードを選んでください."
-	echo "  1:standard版"
-	echo "  2:fullspec版"
-	echo "  3:aibom版"
-	echo "  4:gamernium版"
-	echo "  q:終了"
-	read input
-
-	if [ -z $input ] ; then
-		conform_check
-
-	elif [ $input = '1' ] ; then
-		bpath='standard'
-
-	elif [ $input = '2' ] ; then
-		bpath='fullspec'
-
-	elif [ $input = '3' ] ; then
-		bpath='aibom'
-
-	elif [ $input = '4' ] ; then
-		bpath='gamernium'
-
-	elif [ $input = 'q' ] || [ $input = 'Q' ] ; then
-		echo "  スクリプトを終了します."
-		exit 1
-
-	else
-		conform_check
-
-	fi
+	mkdir /home/pi/fdximg
+	chmod 777 /home/pi/fdximg
 }
 
 conform_check
+board_check
+if [ $board = 'RaSCSI' ] ; then
+	rascsi_check
+fi
 update_package
 update_raspiconf
 apt_get_install
-rascsi_install
+if [ $board = 'RaSCSI' ] ; then
+	rascsi_install
+else
+	fdx68_install
+fi
 
 echo "Please sudo reboot"
 exit 0

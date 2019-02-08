@@ -9,7 +9,7 @@ header( 'Cache-Control: post-check=0, pre-check=0', FALSE );
 // HTTP/1.0
 header( 'Pragma: no-cache' );
 
-define("IMAGE_PATH", "/home/samba/HDD/");
+define("IMAGE_PATH", "/home/pi/rasimg/");
 define("PROCESS_PATH", "/usr/local/bin/");
 define("PROCESS_NAME1", "rasctl");
 define("PROCESS_NAME2", "rascsi");

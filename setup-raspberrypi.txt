@@ -56,21 +56,20 @@ $ sudo reboot
 ■sambaのインストール
 $ sudo apt install samba
 
-$ sudo mkdir /home/samba
-$ sudo chmod 777 /home/samba
-
 $ sudo cp -p /etc/samba/smb.conf /etc/samba/smb.conf.org
 $ sudo vi /etc/samba/smb.conf 
 
 ----------ファイルの下に追加----------
 [public]
-   comment = Raspberry Pi
-   path = /home/samba
-   guest ok = yes
-   read only = no
+   comment = raspberry pi
+   path = /home/pi
    public = yes
+   read only = no
    browsable = yes
+   guest ok = yes
    force user = pi
+   force create mode = 0777
+   force directory mode = 0777
 ----------ファイルの下に追加----------
 
 sambaの起動

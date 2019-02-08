@@ -1,0 +1,5 @@
+
+gitからセットアップファイルを落とす
+wget https://raw.githubusercontent.com/ztto/rascsi-php/master/rascsiphp_setup.sh
+chmod 755 rascsiphp_setup.sh
+sudo ./rascsiphp_setup.sh

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+#
+#
+# update package and firmware
+function update_package(){
+
+	# update package
+	apt-get -y update
+	apt-get -y upgrade
+	apt-get dist-upgrade
+
+	# update firmware
+	#rpi-update
+}
+
+# install apt-get package
+function apt_get_install(){
+
+	# Install nginx
+	apt -y install nginx
+
+	# Install php7.0-fpm
+	apt -y install php7.0-fpm
+
+	sed -i -e "44s:index index.html:index index.php index.html:" /etc/nginx/sites-enabled/default
+	sed -i -e "56,57s:^	#:	:" /etc/nginx/sites-enabled/default
+	sed -i -e "60s:^	#:	:" /etc/nginx/sites-enabled/default
+	sed -i -e "63s:^	#:	:" /etc/nginx/sites-enabled/default
+
+	if ! grep "www-data" "/etc/sudoers" >/dev/null; then
+		echo "www-data ALL=NOPASSWD:/sbin/shutdown" >> /etc/sudoers
+		echo "www-data ALL=NOPASSWD:/usr/bin/pkill" >> /etc/sudoers
+	fi
+}
+	
+# install rascsi-php
+function rascsiphp_install(){
+
+	# Install rascsi-php
+	cd /var/www/html
+	wget https://raw.githubusercontent.com/ztto/rascsi-php/master/index.php
+}
+
+function conform_check() {
+
+	# sudo 
+	if [[ "$(id -u)" -ne 0 ]]; then
+	 	echo "Try 'sudo $0'"
+	        echo "  実行する場合は 'sudo $0' と入力して下さい."
+		exit 1
+	fi
+}
+
+conform_check
+update_package
+apt_get_install
+rascsiphp_install
+
+echo "Please sudo reboot"
+exit 0
