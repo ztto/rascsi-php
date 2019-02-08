@@ -2,7 +2,7 @@
 
 RaSCSI for php とはRaSCSIをブラウザベースで使えるようにしたものです。<br>
 またRaSCSIとは GIMONSさん http://retropc.net/gimons/rascsi/ が開発したRaspberry PIを使った<br>
-過去の遺物と化したSCSIデバイス(ハードディスク，MO，CD-ROM)を仮想的に再現するハードウェアとソフトウェアの総称です。<br>
+SCSIデバイス(ハードディスク，MO，CD-ROM)を仮想的に再現するハードウェアとソフトウェアの総称です。<br>
 
 # Setup
 * 下記2つの設定を行うことでRaSCSI for phpを使うことができます。<br>
