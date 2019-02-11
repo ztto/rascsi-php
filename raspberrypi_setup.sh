@@ -128,18 +128,19 @@ function apt_get_install(){
 function rascsi_install(){
 
 	# Install Rascsi
+	mkdir /home/pi/rasimg
+	chmod 777 /home/pi/rasimg
+
 	cd /tmp
-	wget http://retropc.net/gimons/rascsi/rascsi141.zip
-	unzip rascsi141.zip
-	cd rascsi141/bin/raspberrypi/
+	wget http://retropc.net/gimons/rascsi/rascsi142.zip
+	unzip rascsi142.zip
+	cd rascsi142/bin/raspberrypi/
 	tar xzvf rascsi.tar.gz
 	cd ${bpath}
 	cp -p * /usr/local/bin
+	cp -p /tmp/rascsi142/bin/x68k/RASDRIVER.HDS /home/pi/rasimg
 	cd /tmp
-	rm -r rascsi141.zip rascsi141
-
-	mkdir /home/pi/rasimg
-	chmod 777 /home/pi/rasimg
+	rm -r rascsi142.zip rascsi142
 
 	echo "!/bin/sh" > /home/pi/rasimg/rasmount.sh
 	echo "rascsi -ID0 /home/pi/rasimg/scsiimg0.hds -ID6 bridge" >> /home/pi/rasimg/rasmount.sh
