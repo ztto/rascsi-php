@@ -2,13 +2,47 @@
 
 #
 #
+fdxVer='114'
+rascsiVer='144p1'
+
 function conform_check() {
 
 	# sudo 
 	if [[ "$(id -u)" -ne 0 ]]; then
 	 	echo "Try 'sudo $0'"
-	        echo "  実行する場合は 'sudo $0' と入力して下さい."
+		echo "  実行する場合は 'sudo $0' と入力して下さい."
 		exit 1
+	fi
+}
+
+function update_check() {
+
+	echo "----------------------------"
+	echo "  インストール対象を選んでください."
+	echo "  1:All Install"
+	echo "                 Raspberry PIに対する初期設定"
+	echo "                 FDX68 or RaSCSIの設定"
+	echo "  2:update FDX68 or RaSCSI"
+	echo "                 FDX68 or RaSCSIの更新"
+	echo "  q:終了"
+	read input
+
+	if [ -z $input ] ; then
+		update_check
+
+	elif [ $input = '1' ] ; then
+		update='All'
+
+	elif [ $input = '2' ] ; then
+		update='FDX68RASCSI'
+
+	elif [ $input = 'q' ] || [ $input = 'Q' ] ; then
+		echo "  スクリプトを終了します."
+		exit 1
+
+	else
+		update_check
+
 	fi
 }
 
@@ -110,7 +144,7 @@ function apt_get_install(){
 	if ! grep "raspberry pi" "/etc/samba/smb.conf" >/dev/null; then
 
 		apt-get install  -y samba
-	   	cp -p /etc/samba/smb.conf /etc/samba/smb.conf.org
+		cp -p /etc/samba/smb.conf /etc/samba/smb.conf.org
 		echo "[public]" >> /etc/samba/smb.conf
 		echo "   comment = raspberry pi" >> /etc/samba/smb.conf
 		echo "   path = /home/pi" >> /etc/samba/smb.conf
@@ -128,64 +162,97 @@ function apt_get_install(){
 function rascsi_install(){
 
 	# Install Rascsi
-	mkdir /home/pi/rasimg
-	chmod 777 /home/pi/rasimg
+	if [ -e /usr/local/bin/rascsi ]; then
+		# stop RaSCSI
+		systemctl stop rascsi
 
-	cd /tmp
-	wget http://retropc.net/gimons/rascsi/rascsi144.zip
-	unzip rascsi144.zip
-	cd rascsi144/bin/raspberrypi/
-	tar xzvf rascsi.tar.gz
-	cd ${bpath}
-	cp -p * /usr/local/bin
-	cp -p /tmp/rascsi144/bin/x68k/RASDRIVER.HDS /home/pi/rasimg
-	cd /tmp
-	rm -r rascsi144.zip rascsi144
+		cd /tmp
+		wget http://retropc.net/gimons/rascsi/rascsi${rascsiVer}.zip
+		unzip rascsi${rascsiVer}.zip
+		cd rascsi${rascsiVer}/bin/raspberrypi/
+		tar xzvf rascsi.tar.gz
+		cd ${bpath}
+		cp -p * /usr/local/bin
+		cd /tmp
+		rm -r rascsi${rascsiVer}.zip rascsi${rascsiVer}
 
-	echo "!/bin/sh" > /home/pi/rasimg/rasmount.sh
-	echo "rascsi -ID0 /home/pi/rasimg/scsiimg0.hds -ID6 bridge" >> /home/pi/rasimg/rasmount.sh
-	chmod 755 /home/pi/rasimg/rasmount.sh
+		# start RaSCSI
+		systemctl start rascsi
+	else
+		mkdir /home/pi/rasimg
+		chmod 777 /home/pi/rasimg
 
-	echo "[Unit]" > /etc/systemd/system/rascsi.service
-	echo "Description=RaSCSI_Service" >> /etc/systemd/system/rascsi.service
-	echo "After=syslog.target" >> /etc/systemd/system/rascsi.service
-	echo "[Service]" >> /etc/systemd/system/rascsi.service
-	echo "Type=simple" >> /etc/systemd/system/rascsi.service
-	echo "ExecStart=/usr/bin/sudo /home/pi/rasimg/rasmount.sh" >> /etc/systemd/system/rascsi.service
-	echo "TimeoutStopSec=5" >> /etc/systemd/system/rascsi.service
-	echo "StandardOutput=null" >> /etc/systemd/system/rascsi.service
-	echo "Restart=no" >> /etc/systemd/system/rascsi.service
-	echo "[Install]" >> /etc/systemd/system/rascsi.service
-	echo "WantedBy = multi-user.target" >> /etc/systemd/system/rascsi.service
+		cd /tmp
+		wget http://retropc.net/gimons/rascsi/rascsi${rascsiVer}.zip
+		unzip rascsi${rascsiVer}.zip
+		cd rascsi${rascsiVer}/bin/raspberrypi/
+		tar xzvf rascsi.tar.gz
+		cd ${bpath}
+		cp -p * /usr/local/bin
+		cp -p /tmp/rascsi${rascsiVer}/bin/x68k/RASDRIVER.HDS /home/pi/rasimg
+		cd /tmp
+		rm -r rascsi${rascsiVer}.zip rascsi${rascsiVer}
 
-	dd if=/dev/zero of=/home/pi/rasimg/scsiimg0.hds bs=1M count=40
+		echo "!/bin/sh" > /home/pi/rasimg/rasmount.sh
+		echo "rascsi -ID0 /home/pi/rasimg/scsiimg0.hds -ID6 bridge" >> /home/pi/rasimg/rasmount.sh
+		chmod 755 /home/pi/rasimg/rasmount.sh
 
-	systemctl enable rascsi
+		echo "[Unit]" > /etc/systemd/system/rascsi.service
+		echo "Description=RaSCSI_Service" >> /etc/systemd/system/rascsi.service
+		echo "After=syslog.target" >> /etc/systemd/system/rascsi.service
+		echo "[Service]" >> /etc/systemd/system/rascsi.service
+		echo "Type=simple" >> /etc/systemd/system/rascsi.service
+		echo "ExecStart=/usr/bin/sudo /home/pi/rasimg/rasmount.sh" >> /etc/systemd/system/rascsi.service
+		echo "TimeoutStopSec=5" >> /etc/systemd/system/rascsi.service
+		echo "StandardOutput=null" >> /etc/systemd/system/rascsi.service
+		echo "Restart=no" >> /etc/systemd/system/rascsi.service
+		echo "[Install]" >> /etc/systemd/system/rascsi.service
+		echo "WantedBy = multi-user.target" >> /etc/systemd/system/rascsi.service
+
+		dd if=/dev/zero of=/home/pi/rasimg/scsiimg0.hds bs=1M count=40
+
+		systemctl enable rascsi
+	fi
 }
 
 # install fdx68 package
 function fdx68_install(){
 
 	# Install fdx68
-	mkdir /tmp/fdx68
-	cd /tmp/fdx68
-	wget http://retropc.net/gimons/fdx68/fdx68_114.tar.gz
-	tar xzvf fdx68_114.tar.gz
-        rm -r fdx68_114.tar.gz
-        cp -p * /usr/local/bin
+	if [ -e /usr/local/bin/rascsi ]; then
+		# kill fdx68
+		pkill fddemu
 
-	mkdir /home/pi/fdximg
-	chmod 777 /home/pi/fdximg
+		mkdir /tmp/fdx68
+		cd /tmp/fdx68
+		wget http://retropc.net/gimons/fdx68/fdx68_${fdxVer}.tar.gz
+		tar xzvf fdx68_${fdxVer}.tar.gz
+		rm -r fdx68_${fdxVer}.tar.gz
+		cp -p * /usr/local/bin
+	else
+		mkdir /home/pi/fdximg
+		chmod 777 /home/pi/fdximg
+
+		mkdir /tmp/fdx68
+		cd /tmp/fdx68
+		wget http://retropc.net/gimons/fdx68/fdx68_${fdxVer}.tar.gz
+		tar xzvf fdx68_${fdxVer}.tar.gz
+		rm -r fdx68_${fdxVer}.tar.gz
+		cp -p * /usr/local/bin
+	fi
 }
 
 conform_check
+update_check
 board_check
 if [ $board = 'RaSCSI' ] ; then
 	rascsi_check
 fi
-update_package
-update_raspiconf
-apt_get_install
+if [ $update = 'All' ] ; then
+	update_package
+	update_raspiconf
+	apt_get_install
+fi
 if [ $board = 'RaSCSI' ] ; then
 	rascsi_install
 else
