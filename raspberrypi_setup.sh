@@ -219,7 +219,7 @@ function rascsi_install(){
 function fdx68_install(){
 
 	# Install fdx68
-	if [ -e /usr/local/bin/rascsi ]; then
+	if [ -e /usr/local/bin/fddemu ]; then
 		# kill fdx68
 		pkill fddemu
 
