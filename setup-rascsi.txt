@@ -38,7 +38,7 @@ $ chmod 777 /home/pi/rasimg
 NGINXのインストール
 $ sudo apt -y install nginx
 PHPのインストール
-$ sudo apt -y install php7.0-fpm
+$ sudo apt -y install php7.3-fpm
 
 NGINXでPHPを有効にする
 $ cd /etc/nginx/sites-enabled
@@ -51,7 +51,7 @@ $ sudo vi default
  57                 include snippets/fastcgi-php.conf;
  58         #
  59         #       # With php-fpm (or other unix sockets):
- 60                 fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 60                 fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
  61         #       # With php-cgi (or other tcp sockets):
  62         #       fastcgi_pass 127.0.0.1:9000;
  63         }
@@ -66,7 +66,7 @@ www-data ALL=NOPASSWD:/sbin/shutdown
 ファイルの保存はctrl+O
 
 起動方法
-$ sudo service php7.0-fpm restart
+$ sudo service php7.3-fpm restart
 $ sudo service nginx restart
 
 ■RaSCSI-phpのコピー

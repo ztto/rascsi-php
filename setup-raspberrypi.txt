@@ -72,5 +72,5 @@ $ sudo vi /etc/samba/smb.conf
    force directory mode = 0777
 ----------ファイルの下に追加----------
 
-sambaの起動
-$ sudo /etc/init.d/samba restart
+上記作業が終わったら再起動
+$ sudo reboot
