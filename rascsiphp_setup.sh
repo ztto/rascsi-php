@@ -6,16 +6,16 @@
 function update_package(){
 
 	# update package
-	apt-get -y update
-	apt-get -y upgrade
-	apt-get dist-upgrade
+	apt -y update
+	apt -y upgrade
+	apt dist-upgrade
 
 	# update firmware
 	#rpi-update
 }
 
-# install apt-get package
-function apt_get_install(){
+# install apt package
+function apt_install(){
 
 	# Install nginx
 	apt -y install nginx
@@ -54,7 +54,7 @@ function conform_check() {
 
 conform_check
 update_package
-apt_get_install
+apt_install
 rascsiphp_install
 
 echo "Please sudo reboot"

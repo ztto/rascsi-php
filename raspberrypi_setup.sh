@@ -114,9 +114,9 @@ function rascsi_check() {
 function update_package(){
 
 	# update package
-	apt-get -y update
-	apt-get -y upgrade
-	apt-get dist-upgrade
+	apt -y update
+	apt -y upgrade
+	apt dist-upgrade
 
 	# update firmware
 	#rpi-update
@@ -137,13 +137,13 @@ function update_raspiconf(){
 	raspi-config nonint do_change_locale en_US.UTF-8 UTF-8
 }
 
-# install apt-get package
-function apt_get_install(){
+# install apt package
+function apt_install(){
 
 	# Install Samba
 	if ! grep "raspberry pi" "/etc/samba/smb.conf" >/dev/null; then
 
-		apt-get install  -y samba
+		apt install  -y samba
 		cp -p /etc/samba/smb.conf /etc/samba/smb.conf.org
 		echo "[public]" >> /etc/samba/smb.conf
 		echo "   comment = raspberry pi" >> /etc/samba/smb.conf
@@ -251,7 +251,7 @@ fi
 if [ $update = 'All' ] ; then
 	update_package
 	update_raspiconf
-	apt_get_install
+	apt_install
 fi
 if [ $board = 'RaSCSI' ] ; then
 	rascsi_install
