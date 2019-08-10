@@ -2,7 +2,7 @@
 
 #
 #
-fdxVer='121'
+fdxVer='123'
 rascsiVer='145'
 
 function conform_check() {
