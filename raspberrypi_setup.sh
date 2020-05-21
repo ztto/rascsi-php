@@ -2,7 +2,8 @@
 
 #
 #
-fdxVer='125'
+fdx68Ver='125'
+fdx68conVer='1.01'
 rascsiVer='147'
 
 function conform_check() {
@@ -110,6 +111,34 @@ function rascsi_check() {
 	fi
 }
 
+function fdx68_check() {
+
+	echo "----------------------------"
+	echo "  対象を選んでください."
+	echo "  1:fdx68のみ"
+	echo "  2:fdx68 + fdx68con"
+	echo "  q:終了"
+	read input
+
+	if [ -z $input ] ; then
+		fdx68_check
+
+	elif [ $input = '1' ] ; then
+		bpath='fdx68'
+
+	elif [ $input = '2' ] ; then
+		bpath='fdx68_fdx68con'
+
+	elif [ $input = 'q' ] || [ $input = 'Q' ] ; then
+		echo "  スクリプトを終了します."
+		exit 1
+
+	else
+		fdx68_check
+
+	fi
+}
+
 # update package and firmware
 function update_package(){
 
@@ -135,6 +164,9 @@ function update_raspiconf(){
 	locale-gen ja_JP.EUC-JP
 	locale-gen ja_JP.UTF-8
 	raspi-config nonint do_change_locale en_US.UTF-8 UTF-8
+	
+	# Install Note Font
+	apt -y install fonts-noto
 }
 
 # install apt package
@@ -223,22 +255,35 @@ function fdx68_install(){
 		# kill fdx68
 		pkill fddemu
 
-		mkdir /tmp/fdx68
-		cd /tmp/fdx68
-		wget http://retropc.net/gimons/fdx68/fdx68_${fdxVer}.tar.gz
-		tar xzvf fdx68_${fdxVer}.tar.gz
-		rm -r fdx68_${fdxVer}.tar.gz
-		cp -p * /usr/local/bin
 	else
 		mkdir /home/pi/fdximg
 		chmod 777 /home/pi/fdximg
 
-		mkdir /tmp/fdx68
-		cd /tmp/fdx68
-		wget http://retropc.net/gimons/fdx68/fdx68_${fdxVer}.tar.gz
-		tar xzvf fdx68_${fdxVer}.tar.gz
-		rm -r fdx68_${fdxVer}.tar.gz
-		cp -p * /usr/local/bin
+	fi
+	mkdir /tmp/fdx68
+	cd /tmp/fdx68
+	wget http://retropc.net/gimons/fdx68/fdx68_${fdx68Ver}.tar.gz
+	tar xzvf fdx68_${fdx68Ver}.tar.gz
+	rm -r fdx68_${fdx68Ver}.tar.gz
+	cp -p * /usr/local/bin
+        cd /tmp
+	rm -r fdx68
+	
+
+	if [ $bpath = 'fdx68_fdx68con' ] ; then
+		# Install fdx68con
+		if [ -e /usr/local/bin/FDX68con ]; then
+			# kill fdx68con
+			pkill FDX68con
+		fi
+
+		cd /tmp/
+		wget https://www.michaels-home.com/wp/wp-content/uploads/2020/05/FDX68con_${fdx68conVer}.tar.gz
+		tar xzvf FDX68con_${fdx68conVer}.tar.gz
+		cd FDX68con
+		sudo ./install_FDX68con.sh
+		cd /tmp
+		rm -r FDX68con_${fdx68conVer}.tar.gz FDX68con
 	fi
 }
 
@@ -247,6 +292,9 @@ update_check
 board_check
 if [ $board = 'RaSCSI' ] ; then
 	rascsi_check
+fi
+if [ $board = 'FDX68' ] ; then
+	fdx68_check
 fi
 if [ $update = 'All' ] ; then
 	update_package
