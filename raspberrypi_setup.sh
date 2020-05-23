@@ -10,7 +10,7 @@ function conform_check() {
 
 	# sudo 
 	if [[ "$(id -u)" -ne 0 ]]; then
-	 	echo "Try 'sudo $0'"
+		echo "Try 'sudo $0'"
 		echo "  実行する場合は 'sudo $0' と入力して下さい."
 		exit 1
 	fi
@@ -266,7 +266,7 @@ function fdx68_install(){
 	tar xzvf fdx68_${fdx68Ver}.tar.gz
 	rm -r fdx68_${fdx68Ver}.tar.gz
 	cp -p * /usr/local/bin
-        cd /tmp
+	cd /tmp
 	rm -r fdx68
 	
 
@@ -278,12 +278,14 @@ function fdx68_install(){
 		fi
 
 		cd /tmp/
-		wget https://www.michaels-home.com/wp/wp-content/uploads/2020/05/FDX68con_${fdx68conVer}.tar.gz
+		wget https://www.michaels-home.com/wp/wp-content/uploads/fdx68con/FDX68con_FinalVersion.txt
+		fdx68conVer=`cat /tmp/FDX68con_FinalVersion.txt`
+		wget https://www.michaels-home.com/wp/wp-content/uploads/fdx68con/FDX68con_${fdx68conVer}.tar.gz
 		tar xzvf FDX68con_${fdx68conVer}.tar.gz
 		cd FDX68con
 		sudo ./install_FDX68con.sh
 		cd /tmp
-		rm -r FDX68con_${fdx68conVer}.tar.gz FDX68con
+		rm -r FDX68con_${fdx68conVer}.tar.gz FDX68con FDX68con_FinalVersion.txt
 	fi
 }
 
