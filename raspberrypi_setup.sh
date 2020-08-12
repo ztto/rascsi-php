@@ -4,7 +4,6 @@
 #
 fdx68Ver='125'
 fdx68conVer='1.01'
-rascsiVer='147'
 
 function conform_check() {
 
@@ -145,6 +144,7 @@ function update_package(){
 	# update package
 	apt -y update
 	apt -y upgrade
+	apt -y autoremove
 	apt dist-upgrade
 
 	# update firmware
@@ -199,14 +199,14 @@ function rascsi_install(){
 		systemctl stop rascsi
 
 		cd /tmp
-		wget http://retropc.net/gimons/rascsi/rascsi${rascsiVer}.zip
-		unzip rascsi${rascsiVer}.zip
-		cd rascsi${rascsiVer}/bin/raspberrypi/
+		wget http://retropc.net/gimons/rascsi/rascsi.zip
+		unzip rascsi.zip
+		cd rascsi/bin/raspberrypi/
 		tar xzvf rascsi.tar.gz
 		cd ${bpath}
 		cp -p * /usr/local/bin
 		cd /tmp
-		rm -r rascsi${rascsiVer}.zip rascsi${rascsiVer}
+		rm -r rascsi.zip rascsi
 
 		# start RaSCSI
 		systemctl start rascsi
@@ -215,15 +215,15 @@ function rascsi_install(){
 		chmod 777 /home/pi/rasimg
 
 		cd /tmp
-		wget http://retropc.net/gimons/rascsi/rascsi${rascsiVer}.zip
-		unzip rascsi${rascsiVer}.zip
-		cd rascsi${rascsiVer}/bin/raspberrypi/
+		wget http://retropc.net/gimons/rascsi/rascsi.zip
+		unzip rascsi.zip
+		cd rascsi/bin/raspberrypi/
 		tar xzvf rascsi.tar.gz
 		cd ${bpath}
 		cp -p * /usr/local/bin
-		cp -p /tmp/rascsi${rascsiVer}/bin/x68k/RASDRIVER.HDS /home/pi/rasimg
+		cp -p /tmp/rascsi/bin/x68k/RASDRIVER.HDS /home/pi/rasimg
 		cd /tmp
-		rm -r rascsi${rascsiVer}.zip rascsi${rascsiVer}
+		rm -r rascsi.zip rascsi
 
 		echo "!/bin/sh" > /home/pi/rasimg/rasmount.sh
 		echo "rascsi -ID0 /home/pi/rasimg/scsiimg0.hds -ID6 bridge" >> /home/pi/rasimg/rasmount.sh
