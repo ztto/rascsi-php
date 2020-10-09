@@ -2,7 +2,6 @@
 
 #
 #
-fdx68Ver='125'
 fdx68conVer='1.01'
 
 function conform_check() {
@@ -252,24 +251,52 @@ function fdx68_install(){
 
 	# Install fdx68
 	if [ -e /usr/local/bin/fddemu ]; then
-		# kill fdx68
-		pkill fddemu
+		# stop fdx68
+		systemctl stop fdx68
 
+		mkdir /tmp/fdx68
+		cd /tmp/fdx68
+		wget http://retropc.net/gimons/fdx68/fdx68.tar.gz
+		tar xzvf fdx68.tar.gz
+		rm -r fdx68.tar.gz
+		cp -p * /usr/local/bin
+		cd /tmp
+		rm -r fdx68
+
+		# start fdx68
+		systemctl start fdx68
 	else
 		mkdir /home/pi/fdximg
 		chmod 777 /home/pi/fdximg
 
-	fi
-	mkdir /tmp/fdx68
-	cd /tmp/fdx68
-	wget http://retropc.net/gimons/fdx68/fdx68_${fdx68Ver}.tar.gz
-	tar xzvf fdx68_${fdx68Ver}.tar.gz
-	rm -r fdx68_${fdx68Ver}.tar.gz
-	cp -p * /usr/local/bin
-	cd /tmp
-	rm -r fdx68
-	
+		mkdir /tmp/fdx68
+		cd /tmp/fdx68
+		wget http://retropc.net/gimons/fdx68/fdx68.tar.gz
+		tar xzvf fdx68.tar.gz
+		rm -r fdx68.tar.gz
+		cp -p * /usr/local/bin
+		cd /tmp
+		rm -r fdx68
 
+		echo "!/bin/sh" > /home/pi/fdximg/fdx68mount.sh
+		echo "fddemu" >> /home/pi/fdximg/fdx68mount.sh
+		chmod 755 /home/pi/fdximg/fdx68mount.sh
+
+		echo "[Unit]" > /etc/systemd/system/fdx68.service
+		echo "Description=FDX68_Service" >> /etc/systemd/system/fdx68.service
+		echo "After=syslog.target" >> /etc/systemd/system/fdx68.service
+		echo "[Service]" >> /etc/systemd/system/fdx68.service
+		echo "Type=simple" >> /etc/systemd/system/fdx68.service
+		echo "ExecStart=/usr/bin/sudo /home/pi/fdximg/fdx68mount.sh" >> /etc/systemd/system/fdx68.service
+		echo "TimeoutStopSec=5" >> /etc/systemd/system/fdx68.service
+		echo "StandardOutput=null" >> /etc/systemd/system/fdx68.service
+		echo "Restart=no" >> /etc/systemd/system/fdx68.service
+		echo "[Install]" >> /etc/systemd/system/fdx68.service
+		echo "WantedBy = multi-user.target" >> /etc/systemd/system/fdx68.service
+
+		systemctl enable fdx68
+
+	fi
 	if [ $bpath = 'fdx68_fdx68con' ] ; then
 		# Install fdx68con
 		if [ -e /usr/local/bin/FDX68con ]; then
