@@ -61,7 +61,7 @@ chmod 755 raspberrypi_setup.sh<br>
 sudo ./raspberrypi_setup.sh<br>
 
 
-# RaSCSI for phpの設定(setup-rascsi.txt)<br>
+# RaSCSI for phpの設定(rascsiphp_setup.txt/rascsiphp_setup.sh)<br>
 1.RaSCSI for phpの設定<br>
 ・gitからセットアップファイルを落として実行します<br>
  ※以下のコマンドをコピー＆ペーストするだけでRaSCSI for phpの設定が完了します。<br>
