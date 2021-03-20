@@ -142,9 +142,12 @@ function update_package(){
 
 	# update package
 	apt -y update
-	apt -y upgrade
-	apt -y autoremove
-	apt dist-upgrade
+	apt-mark hold raspberrypi-kernel
+	apt -y full-upgrade
+	apt-mark unhold raspberrypi-kernel
+	#apt -y upgrade
+	#apt -y autoremove
+	#apt dist-upgrade
 
 	# update firmware
 	#rpi-update
