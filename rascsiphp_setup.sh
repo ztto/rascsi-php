@@ -24,8 +24,8 @@ function apt_install(){
 	# Install nginx
 	apt -y install nginx
 
-	# Install php7.3-fpm
-	apt -y install php7.3-fpm
+	# Install php-fpm
+	apt -y install php-fpm
 
 	sed -i -e "44s:index index.html:index index.php index.html:" /etc/nginx/sites-enabled/default
 	sed -i -e "56,57s:^	#:	:" /etc/nginx/sites-enabled/default
